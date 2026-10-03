@@ -1,0 +1,20 @@
+[
+  {"id": "e1", "from": "Priya Nair <priya.nair@example.com>", "subject": "Return of my desk, order NW-10482", "date": "2026-10-01T09:12:00+00:00",
+   "body": "Hi,\n\nThe desk I ordered (NW-10482, 349 pounds) arrived last week and it is lovely, but it is just too big for my spare room. Could I send it back for a refund?\n\nThanks,\nPriya"},
+  {"id": "e2", "from": "Tom Becker <tom.becker@example.com>", "subject": "Where is my order?", "date": "2026-10-01T10:40:00+00:00",
+   "body": "Hello, I ordered a desk 6 days ago, order number NW-20311, and I have had no tracking email at all. Can you tell me where it is?\n\nTom"},
+  {"id": "e3", "from": "Gary Holt <gary.holt@example.com>", "subject": "THIRD time of asking", "date": "2026-10-01T11:05:00+00:00",
+   "body": "This is the third email I have sent about my broken motor and nobody has replied. This is absolutely unacceptable. If I do not hear back today I will be speaking to my solicitor and to trading standards.\n\nGary Holt"},
+  {"id": "e4", "from": "Mei Lin <mei.lin@example.com>", "subject": "Can't log in", "date": "2026-10-01T13:22:00+00:00",
+   "body": "Hi, I clicked forgot password about an hour ago and nothing has arrived. My account email is mei.lin@example.com. Please help, I need to get into my account.\n\nMei"},
+  {"id": "e5", "from": "Accounts Team <accounts@brightsidestudio.example>", "subject": "Invoice copy for September", "date": "2026-10-02T08:30:00+00:00",
+   "body": "Good morning,\n\nCould you send us a copy of the invoice for our September order? Our finance team needs it for the month end close.\n\nKind regards,\nRaj Patel\nBrightside Studio"},
+  {"id": "e6", "from": "Hannah Cole <hannah.cole@example.com>", "subject": "Please cancel my Care plan", "date": "2026-10-02T09:15:00+00:00",
+   "body": "Hi there, I would like to cancel my Care plan please. I don't use it. Can you let me know how and when it stops?\n\nHannah"},
+  {"id": "e7", "from": "Marcus Webb <marcus@harrowtech.example>", "subject": "Team pricing?", "date": "2026-10-02T10:02:00+00:00",
+   "body": "Hello, we are a company of about 25 people moving to standing desks. Do you offer team pricing, and could you deliver to two offices?\n\nMarcus Webb\nHarrow Tech"},
+  {"id": "e8", "from": "Prize Desk <winner@lucky-draw.example>", "subject": "You have WON a gift card!!!", "date": "2026-10-02T10:30:00+00:00",
+   "body": "Congratulations! You have been selected to claim a free gift card. Click here to claim your prize now, this offer expires today."},
+  {"id": "e9", "from": "Olivia Grant <olivia.grant@example.com>", "subject": "Refund for order NW-30555", "date": "2026-10-02T11:45:00+00:00",
+   "body": "I would like a full refund of $850 for order NW-30555. I bought two desks and I have changed my mind about both of them.\n\nOlivia Grant"}
+]

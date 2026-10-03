@@ -1,0 +1,9 @@
+[
+  {"id": "refunds", "title": "Refunds and returns", "text": "Any desk can be returned within 30 days of delivery in its original packaging for a full refund, minus the cost of return shipping. Refunds go back to the original payment method within 5 to 7 working days of us receiving the return."},
+  {"id": "shipping", "title": "Shipping and delivery", "text": "Orders are dispatched within 2 working days and arrive in 3 to 5 working days. A tracking link is emailed when the order is dispatched. If tracking shows no movement for 7 days, support traces the parcel with the courier."},
+  {"id": "password", "title": "Password reset", "text": "Use Forgot password on the sign in page. The email arrives within 10 minutes, and it is worth checking the spam folder. If it does not arrive, reply with the account email address and support will reset the password by hand."},
+  {"id": "invoices", "title": "Invoices", "text": "Copies of any invoice are in Account, then Billing, then Invoices. Support can also resend an invoice by email on request."},
+  {"id": "cancellation", "title": "Care plan cancellation", "text": "The Care plan can be cancelled at any time in Account, then Care plan. Cover continues until the end of the month that has been paid for. There is no refund for the part month."},
+  {"id": "warranty", "title": "Warranty", "text": "The frame, motor and control panel are covered for 24 months from delivery, and the desktop surface for 12 months. Water damage and use above the 80 kg weight limit are not covered."},
+  {"id": "hours", "title": "Support hours", "text": "Support is open Monday to Friday, 9:00 to 17:30 UK time, and replies within 1 working day."}
+]

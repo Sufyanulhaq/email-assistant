@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Email Assistant</title>
+<style>
+  :root {
+    --bg: #f4f5f7; --panel: #ffffff; --ink: #14181f; --muted: #667085; --line: #e3e6eb;
+    --brand: #5b3fd0; --brand-soft: #efebfc; --warn: #b42318; --warn-soft: #fef3f2; --ok: #067647; --ok-soft: #ecfdf3; --grey-soft: #eef1f6;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 14.5px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  header { display: flex; align-items: center; justify-content: space-between; padding: 18px 28px; }
+  h1 { font-size: 18px; margin: 0; letter-spacing: -0.01em; }
+  .mode { font-size: 12px; color: var(--muted); border: 1px solid var(--line); background: var(--panel); padding: 4px 10px; border-radius: 999px; }
+  main { display: grid; grid-template-columns: 340px 1fr; gap: 20px; padding: 0 28px 28px; max-width: 1180px; margin: 0 auto; align-items: start; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; height: min(1080px, calc(100vh - 100px)); min-height: 540px; overflow-y: auto; }
+  .panel h2 { position: sticky; top: 0; background: var(--panel); z-index: 1; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 0; padding: 16px 20px; border-bottom: 1px solid var(--line); }
+  .item { display: block; width: 100%; text-align: left; font: inherit; background: none; border: 0; border-bottom: 1px solid var(--line); padding: 12px 18px; cursor: pointer; }
+  .item:hover { background: #fafbfc; }
+  .item.on { background: var(--brand-soft); }
+  .item .from { font-weight: 600; }
+  .item .subj { color: #344054; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tags { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag { font-size: 11.5px; padding: 1px 9px; border-radius: 999px; background: var(--grey-soft); color: #344054; }
+  .tag.high { background: #fff1e6; color: #b54708; }
+  .tag.flag { background: var(--warn-soft); color: var(--warn); font-weight: 600; }
+  .tag.done { background: var(--ok-soft); color: var(--ok); font-weight: 600; }
+  .tag.spam { background: var(--grey-soft); color: var(--muted); }
+  .empty { padding: 28px 22px; color: var(--muted); }
+  button.btn { font: inherit; font-weight: 600; border-radius: 9px; padding: 8px 14px; cursor: pointer; border: 1px solid var(--line); background: #fff; color: var(--ink); }
+  button.btn.primary { background: var(--brand); color: #fff; border-color: var(--brand); }
+  button.btn:disabled { opacity: .45; cursor: default; }
+  .link { background: none; border: 0; color: var(--brand); font: inherit; font-weight: 600; cursor: pointer; padding: 0; }
+  details.add { padding: 14px 18px; }
+  details.add summary { cursor: pointer; color: var(--brand); font-weight: 600; }
+  details.add input, details.add textarea { width: 100%; font: inherit; margin-top: 8px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; }
+  .detail { padding: 20px 24px 28px; }
+  .detail h3 { margin: 0 0 2px; font-size: 18px; letter-spacing: -0.01em; }
+  .meta { color: var(--muted); font-size: 13px; margin-bottom: 12px; }
+  .body { white-space: pre-wrap; background: #fafbfc; border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin-bottom: 18px; }
+  .block { border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin-bottom: 14px; }
+  .block h4 { margin: 0 0 8px; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+  .kv { display: grid; grid-template-columns: 90px 1fr; gap: 4px 12px; }
+  .kv .k { color: var(--muted); }
+  .flags { background: var(--warn-soft); border-color: #fecdca; color: var(--warn); }
+  .flags h4 { color: var(--warn); }
+  .flags ul { margin: 0; padding-left: 18px; }
+  textarea.draft { width: 100%; min-height: 150px; font: inherit; line-height: 1.55; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; resize: vertical; }
+  .based { margin: 8px 0 12px; color: var(--muted); font-size: 13px; }
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .confirm { display: flex; gap: 8px; align-items: center; margin: 10px 0 0; color: var(--warn); font-size: 13.5px; }
+  .note { margin-top: 10px; color: var(--muted); font-size: 13px; }
+  @media (max-width: 860px) { main { grid-template-columns: 1fr; padding: 0 16px 20px; } .panel { height: auto; min-height: 0; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>AI Email Assistant</h1>
+  <span class="mode" id="mode">starting</span>
+</header>
+<main>
+  <section class="panel" aria-label="Inbox">
+    <h2>Inbox</h2>
+    <div id="list"></div>
+    <details class="add" id="add">
+      <summary>Add an email</summary>
+      <input id="a-from" placeholder="From, for example Sam Lee &lt;sam@example.com&gt;">
+      <input id="a-subject" placeholder="Subject">
+      <textarea id="a-body" rows="5" placeholder="Message"></textarea>
+      <p><button class="btn primary" id="a-send">Add and analyse</button> <span class="note" id="a-note"></span></p>
+    </details>
+  </section>
+  <section class="panel" aria-label="Email">
+    <h2>Email and draft reply</h2>
+    <div id="detail"><div class="empty">Select an email.</div></div>
+  </section>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+let emails = [], current = null, view = null;
+const LABEL = { refund_request: "Refund request", shipping_status: "Shipping", technical_support: "Technical", billing: "Billing", cancellation: "Cancellation", sales_inquiry: "Sales", complaint: "Complaint", spam: "Spam", other: "Other" };
+
+function node(tag, cls, t) { const e = document.createElement(tag); if (cls) e.className = cls; if (t !== undefined) e.textContent = t; return e; }
+function tag(text, cls) { return node("span", "tag " + (cls || ""), text); }
+async function api(path, opts) {
+  const r = await fetch(path, opts);
+  const j = r.headers.get("content-type")?.includes("json") ? await r.json() : null;
+  if (!r.ok) throw new Error((j && j.detail) || "Something went wrong.");
+  return j;
+}
+const post = (path, body) => api(path, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body || {}) });
+
+function tagsFor(e) {
+  const box = node("div", "tags");
+  box.appendChild(tag(LABEL[e.category] || e.category));
+  if (e.urgency === "high") box.appendChild(tag("Urgent", "high"));
+  if (e.status === "spam") box.appendChild(tag("No reply needed", "spam"));
+  else if (e.status === "approved") box.appendChild(tag("Approved", "done"));
+  else if (e.needs_human) box.appendChild(tag("Needs a person", "flag"));
+  else box.appendChild(tag("Draft ready"));
+  return box;
+}
+
+function renderList() {
+  const list = $("list"); list.innerHTML = "";
+  if (!emails.length) {
+    const e = node("div", "empty", "The inbox is empty. ");
+    const b = node("button", "link", "Load the sample inbox"); b.onclick = async () => { await post("/api/samples"); await refresh(); if (emails.length) open(emails[0].id); };
+    e.appendChild(b); list.appendChild(e); return;
+  }
+  emails.forEach((e) => {
+    const b = node("button", "item" + (e.id === current ? " on" : ""));
+    b.appendChild(node("div", "from", e.from));
+    b.appendChild(node("div", "subj", e.subject));
+    b.appendChild(tagsFor(e));
+    b.onclick = () => open(e.id);
+    list.appendChild(b);
+  });
+}
+
+function renderDetail() {
+  const d = $("detail"); d.innerHTML = "";
+  if (!view) { d.appendChild(node("div", "empty", "Select an email.")); return; }
+  const box = node("div", "detail");
+  box.appendChild(node("h3", "", view.subject));
+  box.appendChild(node("div", "meta", view.email.from + " <" + view.email.address + ">"));
+  box.appendChild(node("div", "body", view.email.body));
+
+  const t = view.triage, a = node("div", "block"); a.appendChild(node("h4", "", "What the assistant found"));
+  const kv = node("div", "kv");
+  [["Category", LABEL[t.category]], ["Urgency", t.urgency], ["Tone", t.sentiment], ["Summary", t.summary],
+   ["Order", t.order_numbers.length ? t.order_numbers.join(", ") : "None mentioned"],
+   ["Amount", t.amount !== null ? Number(t.amount).toLocaleString("en-GB") : "None mentioned"]].forEach(([k, v]) => { kv.appendChild(node("div", "k", k)); kv.appendChild(node("div", "", v)); });
+  a.appendChild(kv); box.appendChild(a);
+
+  if (view.review.needs_human) {
+    const f = node("div", "block flags"); f.appendChild(node("h4", "", "Needs a person"));
+    const ul = node("ul"); view.review.reasons.forEach((r) => ul.appendChild(node("li", "", r))); f.appendChild(ul); box.appendChild(f);
+  }
+
+  if (!view.draft) { box.appendChild(node("div", "note", "This looks like spam, so no reply was drafted.")); d.appendChild(box); return; }
+  const dr = view.draft;
+  box.appendChild(node("h4", "", "Draft reply"));
+  const ta = node("textarea", "draft"); ta.value = dr.text; ta.setAttribute("aria-label", "Draft reply"); box.appendChild(ta);
+  const based = node("div", "based");
+  based.append(dr.policies.length ? "Based on: " : "Not based on a policy. ");
+  dr.policies.forEach((p) => { const c = tag(p.title); c.title = p.text; c.style.marginRight = "6px"; based.appendChild(c); });
+  box.appendChild(based);
+
+  const actions = node("div", "actions");
+  const save = node("button", "btn", "Save edits"); save.disabled = true; ta.oninput = () => { save.disabled = ta.value.trim() === dr.text; grow(ta); };
+  save.onclick = async () => { view = await api("/api/emails/" + view.id + "/draft", { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify({ text: ta.value }) }); await refresh(); renderDetail(); };
+  const regen = node("button", "btn", "Write it again"); regen.onclick = async () => { if (dr.edited && !confirm("This replaces your edits. Continue?")) return; view = await post("/api/emails/" + view.id + "/regenerate"); await refresh(); renderDetail(); };
+  actions.append(save, regen);
+  let ack = null;
+  if (!dr.approved) {
+    const ok = node("button", "btn primary", "Approve draft");
+    ok.onclick = async () => {
+      try { view = await post("/api/emails/" + view.id + "/approve", { acknowledge_flags: ack ? ack.checked : false }); await refresh(); renderDetail(); }
+      catch (e) { note.textContent = e.message; }
+    };
+    actions.appendChild(ok);
+  } else {
+    const dl = node("a", "btn primary", "Download as .eml"); dl.href = "/api/emails/" + view.id + "/draft.eml"; dl.style.textDecoration = "none"; actions.appendChild(dl);
+  }
+  box.appendChild(actions);
+  if (view.review.needs_human && !dr.approved) {
+    const c = node("label", "confirm"); ack = node("input"); ack.type = "checkbox"; c.append(ack, "I have read the flags above and checked this draft."); box.appendChild(c);
+  }
+  const note = node("div", "note", dr.approved ? "Approved. This demo never sends email. Download the draft and send it from your own mail program." : "Nothing is sent. Approving only unlocks the download.");
+  box.appendChild(note);
+  d.appendChild(box);
+  grow(document.querySelector("textarea.draft"));
+}
+
+function grow(ta) { if (ta) { ta.style.height = "auto"; ta.style.height = ta.scrollHeight + 6 + "px"; } }
+
+async function refresh() { emails = await api("/api/emails"); renderList(); }
+async function open(id) { current = id; view = await api("/api/emails/" + id); renderList(); renderDetail(); }
+
+$("a-send").onclick = async () => {
+  $("a-note").textContent = "";
+  try {
+    const r = await post("/api/emails", { from: $("a-from").value, subject: $("a-subject").value, body: $("a-body").value });
+    ["a-from", "a-subject", "a-body"].forEach((i) => ($(i).value = ""));
+    await refresh(); open(r.id); $("add").open = false;
+  } catch (e) { $("a-note").textContent = e.message; }
+};
+
+(async () => {
+  const h = await api("/api/health");
+  $("mode").textContent = h.mode === "claude" ? "Claude drafts the replies" : "Offline mode, templates over your policies";
+  await refresh();
+})();
+</script>
+</body>
+</html>
